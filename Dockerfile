@@ -13,22 +13,22 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Add LLVM repository and install LLVM-17 (latest stable)
+# Add LLVM repository and install LLVM-13
 RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - \
-    && add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-17 main" \
+    && add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-13 main" \
     && apt-get update \
     && apt-get install -y \
-        llvm-17-dev \
-        llvm-17-tools \
-        clang-17 \
+        llvm-13-dev \
+        llvm-13-tools \
+        clang-13 \
         bison \
         flex \
     && rm -rf /var/lib/apt/lists/*
 
 # Create symlinks for easier access (optional)
-RUN ln -s /usr/bin/llvm-config-17 /usr/bin/llvm-config \
-    && ln -s /usr/bin/clang-17 /usr/bin/clang \
-    && ln -s /usr/bin/clang++-17 /usr/bin/clang++
+RUN ln -s /usr/bin/llvm-config-13 /usr/bin/llvm-config \
+    && ln -s /usr/bin/clang-13 /usr/bin/clang \
+    && ln -s /usr/bin/clang++-13 /usr/bin/clang++
 
 # Install bats-core for testing
 RUN git clone https://github.com/bats-core/bats-core.git /tmp/bats-core \
