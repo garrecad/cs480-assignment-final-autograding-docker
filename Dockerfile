@@ -1,22 +1,43 @@
-# Use the same base image as your current container
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
+# Avoid interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install basic dependencies
+# Update package list and install essential tools
 RUN apt-get update && apt-get install -y \
-    wget git build-essential software-properties-common apt-transport-https \
+    wget \
+    gnupg \
+    software-properties-common \
+    git \
+    build-essential \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install LLVM 13, flex, bison
-RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
-    add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-13 main" && \
-    apt-get update && apt-get install -y llvm-13-dev bison flex && \
-    rm -rf /var/lib/apt/lists/*
+# Add LLVM repository and install LLVM-17 (latest stable)
+RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - \
+    && add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-17 main" \
+    && apt-get update \
+    && apt-get install -y \
+        llvm-17-dev \
+        llvm-17-tools \
+        clang-17 \
+        bison \
+        flex \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install bats testing framework
-RUN git clone https://github.com/bats-core/bats-core.git && \
-    cd bats-core && ./install.sh /usr/local && \
-    cd .. && rm -rf bats-core
+# Create symlinks for easier access (optional)
+RUN ln -s /usr/bin/llvm-config-17 /usr/bin/llvm-config \
+    && ln -s /usr/bin/clang-17 /usr/bin/clang \
+    && ln -s /usr/bin/clang++-17 /usr/bin/clang++
 
+# Install bats-core for testing
+RUN git clone https://github.com/bats-core/bats-core.git /tmp/bats-core \
+    && cd /tmp/bats-core \
+    && ./install.sh /usr/local \
+    && rm -rf /tmp/bats-core
+
+# Set working directory
+WORKDIR /workspace
+
+# Default command
 CMD ["/bin/bash"]
