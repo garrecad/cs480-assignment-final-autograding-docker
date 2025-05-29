@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     bison \
     flex \
     git \
+    gcc \
     && rm -rf /var/lib/apt/lists/*
 
 # Install bats-core for testing
